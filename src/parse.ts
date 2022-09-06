@@ -1,5 +1,4 @@
 import type { JsonFragment } from "@ethersproject/abi";
-import { Interface } from "@ethersproject/abi";
 import * as fs from "fs/promises";
 
 const inputDir = "../web3-template/src/abis/";
@@ -13,13 +12,12 @@ export const parse = async (): Promise<void> => {
       const rawFile = await fs.readFile(inputDir + f);
 
       const jsonFile = JSON.parse(rawFile.toString()) as
-        | Interface
-        | { abi: Interface };
-      const abi = jsonFile instanceof Interface ? jsonFile : jsonFile.abi;
+        | JsonFragment[]
+        | { abi: JsonFragment[] };
 
-      const frags = JSON.parse(JSON.stringify(abi)) as JsonFragment[];
+      const abi = "abi" in jsonFile ? jsonFile.abi : jsonFile;
 
-      const out = frags.map((m) => {
+      const out = abi.map((m) => {
         const { gas, ...rest } = m;
         return { gas: gas?.toString(), ...rest };
       });

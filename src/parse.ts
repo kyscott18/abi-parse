@@ -2,26 +2,34 @@ import type { JsonFragment } from "@ethersproject/abi";
 import { Interface } from "@ethersproject/abi";
 import * as fs from "fs/promises";
 
+const inputDir = "../web3-template/src/abis/";
+const outputDir = "../web3-template/src/abis-new/";
+
 export const parse = async (): Promise<void> => {
-  const rawFile = await fs.readFile("abis/LiquidityGaugeV3.json");
+  const files = await fs.readdir(inputDir);
 
-  const jsonFile = JSON.parse(rawFile.toString()) as
-    | Interface
-    | { abi: Interface };
+  for (const f of files) {
+    try {
+      const rawFile = await fs.readFile(inputDir + f);
 
-  const abi = jsonFile instanceof Interface ? jsonFile : jsonFile.abi;
+      const jsonFile = JSON.parse(rawFile.toString()) as
+        | Interface
+        | { abi: Interface };
+      const abi = jsonFile instanceof Interface ? jsonFile : jsonFile.abi;
 
-  const f = JSON.parse(JSON.stringify(abi)) as JsonFragment[];
+      const frags = JSON.parse(JSON.stringify(abi)) as JsonFragment[];
 
-  const out = f.map((m) => {
-    const { gas, ...rest } = m;
-    return { gas: gas?.toString(), rest };
-  });
+      const out = frags.map((m) => {
+        const { gas, ...rest } = m;
+        return { gas: gas?.toString(), ...rest };
+      });
 
-  await fs.writeFile(
-    "output/LiquidityGaugeV3.json",
-    JSON.stringify(out, null, 2)
-  );
+      await fs.writeFile(outputDir + f, JSON.stringify(out, null, 2));
+    } catch (err) {
+      console.error("Error in " + f);
+      throw err;
+    }
+  }
 };
 
 parse().catch((err) => {

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "author": "Kyle Scott <kyle@dahlia.finance>",
   "license": "AGPL-3.0",
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.2.3",
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
     "@saberhq/eslint-config": "^2.0.4",
@@ -32,5 +32,8 @@
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
     "*.{md,json,js,yml,yaml}": "prettier --write"
+  },
+  "dependencies": {
+    "@ethersproject/abi": "^5.7.0"
   }
 }
